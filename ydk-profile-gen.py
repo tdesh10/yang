@@ -53,23 +53,39 @@ for dir_file in dir_files:
     elif fnmatch.fnmatch(dir_file, '*.yang'):
         other_files.append(profile_path + '/' + dir_file)
 
+
+# converst list to a string without [] but keeps elementes with quotes and
+# separated with ,\n
+def convert_to_json_file_list(file_list):
+    if file_list:
+        return (',\n\t\t\t\t\t\t\t\t').join('\"{0}\"'.format(elem) for elem in file_list)
+    else:
+        return ''
+
+cisco_ios_xr_files = convert_to_json_file_list(cisco_ios_xr_files)
+if cisco_ios_xr_files and (tail_f_files or other_files):
+    cisco_ios_xr_files += ','
+
+tail_f_files = convert_to_json_file_list(tail_f_files)
+if tail_f_files and other_files:
+    tail_f_files += ','
+
+other_files = convert_to_json_file_list(other_files)
+
+template_vars = {
+    'version': version,
+    'core_version': core_version,
+    'url': remote_repo_url,
+    'commit_id': commit_id,
+    'cisco_ios_xr_files': cisco_ios_xr_files,
+    'tail_f_files': tail_f_files,
+    'other_files': other_files,
+    'dependency_name': dependency_name,
+    'dependency_version': dependency_version,
+    'dependency_core_version': dependency_core_version,
+    'dependency_uri': dependency_uri
+}
+
 with open('cisco-ios-xr_template.json', 'r') as template:
     template_string = template.read()
-    print(eval(f'''{}'''.format(template_string)))
-
-# bundle_profile = {
-#     "name": "cisco-ios-xr",
-#     "version": version,
-#     "core_version": "0.6.0",
-#     "author": "Cisco",
-#     "copyright": "Cisco",
-#     "description": "YDK bundle for Cisco IOS XR models",
-#     "long_description": "This YANG Development Kit (YDK) bundle provides APIs for Cisco IOS XR YANG models. YDK facilitates the use of YANG data models by expressing the model semantics in an API and abstracting protocol/encoding details.  YDK is composed of a core package that defines services and providers, plus one or more module bundles.  This YDK bundle for Cisco IOS XR models uses the YDK core package and additional model bundles.  You can find the SDK documentation at http://ydk.cisco.com/py/docs",
-#     "git" : {
-#         "url": remote_repo_url,
-#         "commitid": commit_id,
-#         "files" : yang_files
-#     }
-# }
-
-# print(json.dumps(bundle_profile, indent=4, separators=(",", ":")))
+    print(template_string.format(**template_vars))
