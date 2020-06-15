@@ -10,12 +10,12 @@ from git import Repo
 parser = argparse.ArgumentParser()
 
 parser.add_argument("path")
-parser.add_argument('--version')
-parser.add_argument('--core-version')
-parser.add_argument('--dependency-name')
-parser.add_argument('--dependency-version')
-parser.add_argument('--dependency-core-version')
-parser.add_argument('--dependency-uri')
+parser.add_argument('--version', required=True)
+parser.add_argument('--core-version', required=True)
+parser.add_argument('--dependency-name', required=True)
+parser.add_argument('--dependency-version', required=True)
+parser.add_argument('--dependency-core-version', required=True)
+parser.add_argument('--dependency-uri', required=True)
 
 args = parser.parse_args()
 
@@ -46,6 +46,8 @@ tail_f_files = []
 other_files = []
 
 for dir_file in dir_files:
+    if (fnmatch.fnmatch(dir_file, '*deviations.yang')) or ('openconfig' in dir_file) or ('ietf' in dir_file) or ('iana' in dir_file):
+        continue
     if fnmatch.fnmatch(dir_file, 'Cisco-IOS-XR*.yang'):
         cisco_ios_xr_files.append(profile_path + '/' + dir_file)
     elif fnmatch.fnmatch(dir_file, 'tail_f*.yang'):
@@ -55,10 +57,10 @@ for dir_file in dir_files:
 
 
 # converst list to a string without [] but keeps elementes with quotes and
-# separated with ,\n
+# separated with ",\n"
 def convert_to_json_file_list(file_list):
     if file_list:
-        return (',\n\t\t\t\t\t\t\t\t').join('\"{0}\"'.format(elem) for elem in file_list)
+        return (',\n                ').join('\"{0}\"'.format(elem) for elem in file_list)
     else:
         return ''
 
