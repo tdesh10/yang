@@ -51,6 +51,7 @@ os_files = []
 tailf_files = []
 other_files = []
 
+dir_files.sort()
 for dir_file in dir_files:
     if (fnmatch.fnmatch(dir_file, '*deviations.yang')) or ('openconfig' in dir_file) or ('ietf' in dir_file) or ('iana' in dir_file):
         continue
